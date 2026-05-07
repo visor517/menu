@@ -4,8 +4,8 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.base import get_session
-import db.models as models
+from db import get_session
+import models as m
 import schemas as s
 
 router = APIRouter()
@@ -21,8 +21,8 @@ async def read_dishes(
 ):
     # Проверяем, существует ли подменю
     result = await session.execute(
-        select(models.SubMenu).where(
-            models.SubMenu.id == sub_id, models.SubMenu.menu_id == menu_id
+        select(m.SubMenu).where(
+            m.SubMenu.id == sub_id, m.SubMenu.menu_id == menu_id
         )
     )
     submenu = result.scalar_one_or_none()
@@ -33,9 +33,7 @@ async def read_dishes(
         )
 
     # Получаем все блюда подменю
-    result = await session.execute(
-        select(models.Dish).where(models.Dish.sub_menu_id == sub_id)
-    )
+    result = await session.execute(select(m.Dish).where(m.Dish.sub_menu_id == sub_id))
     dishes = result.scalars().all()
 
     return [
@@ -58,8 +56,8 @@ async def read_dish_by_id(
     session: AsyncSession = Depends(get_session),
 ):
     result = await session.execute(
-        select(models.Dish).where(
-            models.Dish.id == dish_id, models.Dish.sub_menu_id == sub_id
+        select(m.Dish).where(
+            m.Dish.id == dish_id, m.Dish.sub_menu_id == sub_id
         )
     )
     dish = result.scalar_one_or_none()
@@ -87,8 +85,8 @@ async def create_dish(
 ):
     # Проверяем, существует ли подменю
     result = await session.execute(
-        select(models.SubMenu).where(
-            models.SubMenu.id == sub_id, models.SubMenu.menu_id == menu_id
+        select(m.SubMenu).where(
+            m.SubMenu.id == sub_id, m.SubMenu.menu_id == menu_id
         )
     )
     submenu = result.scalar_one_or_none()
@@ -99,7 +97,7 @@ async def create_dish(
         )
 
     uid = str(uuid.uuid1())
-    new_dish = models.Dish(
+    new_dish = m.Dish(
         id=uid,
         sub_menu_id=sub_id,
         title=request.title,
@@ -130,8 +128,8 @@ async def update_dish(
     session: AsyncSession = Depends(get_session),
 ):
     result = await session.execute(
-        select(models.Dish).where(
-            models.Dish.id == dish_id, models.Dish.sub_menu_id == sub_id
+        select(m.Dish).where(
+            m.Dish.id == dish_id, m.Dish.sub_menu_id == sub_id
         )
     )
     dish = result.scalar_one_or_none()
@@ -161,8 +159,8 @@ async def delete_dish(
     session: AsyncSession = Depends(get_session),
 ):
     result = await session.execute(
-        select(models.Dish).where(
-            models.Dish.id == dish_id, models.Dish.sub_menu_id == sub_id
+        select(m.Dish).where(
+            m.Dish.id == dish_id, m.Dish.sub_menu_id == sub_id
         )
     )
     dish = result.scalar_one_or_none()

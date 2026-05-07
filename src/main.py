@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from db.base import engine
-from db.models import Base
-from handlers import menu, sub_menu, dish
+from db import engine
+from db import Base
+from routes import router
 
 
 @asynccontextmanager
@@ -20,6 +20,4 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="MENU", lifespan=lifespan)
 
-app.include_router(menu.router, prefix="/api/v1/menus", tags=["menus"])
-app.include_router(sub_menu.router, prefix="/api/v1/menus", tags=["submenus"])
-app.include_router(dish.router, prefix="/api/v1/menus", tags=["dishes"])
+app.include_router(router)
